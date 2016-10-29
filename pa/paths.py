@@ -67,6 +67,15 @@ def _find_media_dir():
 
                     raise FileNotFoundError('Could not find PA media directory. You must play the game at least once for this directory to be detected.')
 
+
+def _find_pa_build():
+    pa_version = os.path.normpath(os.path.join(pa_media_dir(), '..', 'version.txt'))
+
+    with open(pa_version) as version:
+        return version.readline().strip()
+
+
+PA_VERSION = _find_pa_build()
 PA_DATA_DIR = _find_data_dir()
 PA_MEDIA_DIR = _find_media_dir()
 
