@@ -69,7 +69,7 @@ def _find_media_dir():
 
 
 def _find_pa_build():
-    pa_version = os.path.normpath(os.path.join(pa_media_dir(), '..', 'version.txt'))
+    pa_version = os.path.normpath(os.path.join(_find_media_dir(), '..', 'version.txt'))
 
     with open(pa_version) as version:
         return version.readline().strip()
