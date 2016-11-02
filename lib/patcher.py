@@ -1,4 +1,3 @@
-import loader
 import decimal
 import collections
 import re
