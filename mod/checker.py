@@ -1,5 +1,7 @@
 from collections import OrderedDict
+
 from pa_tools.pa import pajson
+from pa_tools.pa.paths import PA_MEDIA_DIR
 
 from posixpath import normpath
 
@@ -137,7 +139,7 @@ def _walk_json(mod_report, loader, visited, file_path, referenced_by):
             _walk_json(mod_report, loader, visited, file, resolved_file)
 
 def check_mod(mod_path):
-    from pa.load import Loader
+    from pa_tools.pa import pafs
     from os.path import join, dirname
 
     mod_report = ModReport(mod_path)
@@ -147,7 +149,7 @@ def check_mod(mod_path):
         mod_report.addInfoIssue('FATAL: Could not find modinfo.json')
         return mod_report
 
-    loader = Loader(mod_report.mod_root)
+    loader = pafs(mod_report.mod_root)
 
     modinfo_path = loader.resolveFile('/modinfo.json')
     if modinfo_path is None:
@@ -159,10 +161,12 @@ def check_mod(mod_path):
         return mod_report
 
     # construct loader for checking files
-    from pa.paths import PA_MEDIA_DIR
 
-    loader = Loader(PA_MEDIA_DIR)
-    loader.mount('/pa', '/pa_ex1')
+    loader = pafs(PA_MEDIA_DIR)
+    is_classic_only = mod_report.modinfo.get('classicOnly', False)
+    is_titans_only = mod_report.modinfo.get('titansOnly', False)
+    if is_titans_only or not is_classic_only:
+        loader.mount('/pa', '/pa_ex1')
     loader.mount('/', mod_report.mod_root)
 
     find_missing_files(mod_report, loader)
