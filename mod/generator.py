@@ -19,7 +19,7 @@ def process_changes(changes, loader, out_dir):
             from_file = loader.resolveFile(change['from_file'])
 
             if from_file == None:
-                print ("!! ERROR: Not Found '" + change['from_file'] + "'")
+                print ("\n!! ERROR: Not Found '" + change['from_file'] + "'\n")
                 continue
 
             print('==== loading:', from_file)
@@ -75,7 +75,7 @@ def _join(path1, path2):
 def _do_patch(target, patch, destination, loader, out_dir):
     resolved = loader.resolveFile(target)
     if resolved == None:
-        print ("!! ERROR: Not Found '" + target + "'")
+        print ("\n!! ERROR: Not Found '" + target + "'")
         return
 
     destination_path = _join(out_dir, destination)
