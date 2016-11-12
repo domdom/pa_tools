@@ -159,7 +159,9 @@ def _longest_common_subseq(a, b, path):
 ###################################################################
 
 # apply patch to object and return new object
-def apply_patch(obj, patches):
+def apply_patch(obj, patches, custom_ops={}):
+    global _custom_op_methods
+    _custom_op_methods = custom_ops
     # method names
     # make copy
     obj = copy.deepcopy(obj)
@@ -168,7 +170,12 @@ def apply_patch(obj, patches):
         # check for invalid operation
         _validate_operation(obj, operation)
 
-        obj = _op_methods[operation["op"]](obj, operation)
+        if operation["op"] in _op_methods:
+            op_table = _op_methods
+        if operation["op"] in _custom_op_methods:
+            op_table = _custom_op_methods
+
+        obj = op_table[operation["op"]](obj, operation)
     return obj
 # tries to optimize the list of patches so that
 # add / remove patches are combined where possible
@@ -198,6 +205,8 @@ def _clean_patches(patches):
 # fully validates an operation given the current state
 # throws exeptions as required
 def _validate_operation(doc, operation):
+    if "op" in operation and operation["op"] in _custom_op_methods:
+        return
     if "op" not in operation or operation["op"] not in _op_methods:
         raise JsonPatchError('ERROR_INVALID_OPERATION', 'Operation type %r is not defined.' % operation['op'], operation, doc)
     if operation['op'] not in []:
@@ -458,6 +467,9 @@ _op_methods = {
     "test_gt"       : _op_test_gt, # greater than
     "test_gte"      : _op_test_gte # greater than or equal to
 }
+
+# a list of custom op handlers
+_custom_op_methods = {}
 ############################################
 ############################################
 # return json pointer encoded string
