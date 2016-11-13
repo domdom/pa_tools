@@ -341,7 +341,7 @@ def _json_encoder_default_handler(o):
 def dump(obj, file, **kwargs):
     return json.dump(obj, file, default=_json_encoder_default_handler, **kwargs)
 
-def dumps(obj, file, **kwargs):
+def dumps(obj, **kwargs):
     return json.dumps(obj, default=_json_encoder_default_handler, **kwargs)
 
 
