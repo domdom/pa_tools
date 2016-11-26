@@ -24,7 +24,7 @@ def prune_spec(spec, base_spec):
             if spec[key] == base_spec[key]:
                 del spec[key]
             elif isinstance(spec[key], dict) and isinstance(base_spec[key], dict):
-                spec[key] = _pruneSpec(spec[key], base_spec[key])
+                spec[key] = prune_spec(spec[key], base_spec[key])
 
     return spec
 
