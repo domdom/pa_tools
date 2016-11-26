@@ -63,11 +63,6 @@ def process_changes(changes, loader, out_dir):
 
 
 def process_modinfo(modinfo_path, loader, out_dir):
-    modinfo = collections.OrderedDict([
-        ('identifier', 'no.mod.info.supplied'),
-        ('context', 'client')]
-    )
-
     print('======= Loading Modinfo =======')
 
     resolved = loader.resolveFile(modinfo_path)
@@ -75,11 +70,7 @@ def process_modinfo(modinfo_path, loader, out_dir):
     for w in warnings:
         print(w)
 
-    modinfo.update(base_modinfo)
-
-    modinfo['build'] = str(PA_VERSION)
-    modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
-    modinfo['signature'] = modinfo.get('signature', ' ')
+    modinfo = update_modinfo(base_modinfo)
 
     print('identifier:', modinfo['identifier'])
     print('     build:', modinfo['build'])
@@ -90,7 +81,16 @@ def process_modinfo(modinfo_path, loader, out_dir):
     with open(destination_path, 'w', newline='\n') as dest:
         pajson.dump(modinfo, dest, indent=2)
 
-
+def update_modinfo(base_modinfo):
+    modinfo = collections.OrderedDict([
+        ('identifier', 'no.mod.info.supplied'),
+        ('context', 'client')]
+    )
+    modinfo.update(base_modinfo)
+    modinfo['build'] = str(PA_VERSION)
+    modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
+    modinfo['signature'] = modinfo.get('signature', ' ')
+    return modinfo
 #####################################
 # Helper Methods
 #####################################
