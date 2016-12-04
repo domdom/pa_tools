@@ -254,7 +254,7 @@ def check_modinfo(mod_report, modinfo_path, loader):
     elif category is not None:
         mod_report.addInfoIssue('ERROR: "category" field must be an array of strings.')
 
-    
+
     # context - string - mandatory, server or client
     context = modinfo.get('context', None)
     if context not in ['client', 'server']:
@@ -292,8 +292,11 @@ def _walk_obj(obj):
 
 
 def _find_mod_root(mod_path):
-    from os.path import join, dirname
+    from os.path import join, dirname, isfile
     from glob import glob
+
+    if isfile(join(mod_path, 'modinfo.json')):
+        return mod_path
 
     glob_result = glob(join(mod_path, '**','modinfo.json'), recursive=True)
 
