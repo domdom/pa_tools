@@ -3,17 +3,15 @@ from pa_tools.pa import pajson
 import copy
 
 _cache = {}
-def update_spec(base_spec, spec):
-    base_spec = copy.deepcopy(base_spec)
-    for key, value in spec.items():
-        if key in base_spec and isinstance(base_spec[key], dict) and isinstance(value, dict):
-            base_spec[key] = update_spec(base_spec[key], value)
-        elif key in base_spec and base_spec[key] != value:
-            base_spec[key] = value
-        elif key not in base_spec:
-            base_spec[key] = value
+def update_spec(spec, base_spec):
+    spec = copy.deepcopy(spec)
+    for key, value in base_spec.items():
+        if key not in spec:
+            spec[key] = value
+        elif key in spec and isinstance(spec[key], dict) and isinstance(value, dict):
+            spec[key] = update_spec(spec[key], value)
 
-    return base_spec
+    return spec
 
 
 def prune_spec(spec, base_spec):
@@ -43,7 +41,7 @@ def parse_spec(loader, file_path):
     base_spec_id = spec.get('base_spec', None)
     if base_spec_id:
         base_spec = parse_spec(loader, base_spec_id)
-        spec = update_spec(base_spec, spec)
+        spec = update_spec(spec, base_spec)
 
     _cache[file_path] = spec
     return copy.deepcopy(spec)
