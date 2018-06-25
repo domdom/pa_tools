@@ -17,27 +17,7 @@ def process_changes(changes, loader, out_dir):
     for change in changes:
         # we have an object, but it is a reference to a file patch to load
         if isinstance(change, dict) and 'from_file' in change:
-            from_file = loader.resolveFile(change['from_file'])
-
-            if from_file == None:
-                print ("\n!! ERROR: Not Found '" + change['from_file'] + "'\n")
-                sys.exit(1)
-
-            print('==== loading:', from_file)
-            changes, warnings = pajson.loadf(from_file)
-
-            for w in warnings:
-                print(w)
-            # make sure our changes are a list
-            if isinstance(changes, dict):
-                changes = [changes]
-
-            # process new list recursively.
-            from os.path import dirname
-            loader.mount('/', dirname(from_file))
-            process_changes(changes, loader, out_dir)
-            loader.unmount('/')
-
+            process_from_file(change['from_file'], loader, out_dir)
             continue
 
         # implicit patch
@@ -62,6 +42,28 @@ def process_changes(changes, loader, out_dir):
             for target in change['target']:
                 _do_patch(target, change['patch'], target, loader, out_dir)
 
+def process_from_file(change_file, loader, out_dir):
+    from_file = loader.resolveFile(change_file)
+
+    if from_file == None:
+        print ("\n!! ERROR: Not Found '" + change['from_file'] + "'\n")
+        sys.exit(1)
+
+    print('==== loading:', from_file)
+    changes, warnings = pajson.loadf(from_file)
+
+    for w in warnings:
+        print(w)
+    # make sure our changes are a list
+    if isinstance(changes, dict):
+        changes = [changes]
+
+    # process new list recursively.
+    from os.path import dirname
+    loader.mount('/', dirname(from_file))
+    process_changes(changes, loader, out_dir)
+    loader.unmount('/')
+
 
 def process_modinfo(modinfo_path, loader, out_dir):
     print('======= Loading Modinfo =======')
@@ -84,6 +86,7 @@ def process_modinfo(modinfo_path, loader, out_dir):
 
     return modinfo
 
+
 def update_modinfo(base_modinfo):
     modinfo = collections.OrderedDict([
         ('identifier', 'no.mod.info.supplied'),
@@ -94,6 +97,8 @@ def update_modinfo(base_modinfo):
     modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
     modinfo['signature'] = modinfo.get('signature', ' ')
     return modinfo
+
+
 #####################################
 # Helper Methods
 #####################################
@@ -103,6 +108,7 @@ def _join(path1, path2):
     if path1 is None or path2 is None:
         return None
     return join(path1, path2.strip("/"))
+
 
 # do the actual patch, or copy operation, as it may be
 def _do_patch(target, patch, destination, loader, out_dir):
@@ -163,7 +169,7 @@ def _scale_effect_handler(obj, operation):
                         for j, value in enumerate(emitter[key]['keys']):
                             obj['emitters'][i][key]['keys'][j][1] *= scale
                     else:
-                        print('Unexpected "' + key + '" formet:', emitter[key])
+                        print('Unexpected "' + key + '" format:', emitter[key])
                 except:
                     print('Exception:', key, obj['emitters'][i][key])
                     raise
