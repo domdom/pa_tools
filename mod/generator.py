@@ -138,7 +138,10 @@ def _do_patch(target, patch, destination, loader, out_dir):
     result_obj = patcher.apply_patch(target_obj, patch, custom_ops)
 
     with open(destination_path, 'w', newline='\n') as dest:
-        pajson.dump(result_obj, dest, indent=2)
+        if destination_path.endswith('.pfx'):
+            pajson.dump_effect(result_obj, dest, indent=2)
+        else:
+            pajson.dump(result_obj, dest, indent=2)
 
 ###################################### patcher extensions ##############################
 def _scale_effect_handler(obj, operation):

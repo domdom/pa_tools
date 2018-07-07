@@ -344,6 +344,50 @@ def dump(obj, file, **kwargs):
 def dumps(obj, **kwargs):
     return json.dumps(obj, default=_json_encoder_default_handler, **kwargs)
 
+def _print_obj(obj, level=1, indent=0, **kwargs):
+    ret = ''
+
+    spacer = ('\n' if indent > 0 else '') + ' ' * level * indent
+
+    separator = ','
+
+    if isinstance(obj, list):
+        if level > 2:
+            ret = json.dumps(obj, default=_json_encoder_default_handler, **kwargs, indent=None, separators=(', ', ': '))
+        else:
+            ret += '['
+
+            ret += separator.join([spacer + _print_obj(x, level=level+1, indent=indent, **kwargs) for x in obj])
+
+            if len(obj) > 0:
+                ret += spacer[:-indent]
+
+            ret += ']'
+
+    elif isinstance(obj, dict):
+        ret += '{'
+
+        ret += separator.join([spacer + '"' + k + '"' + ': ' + _print_obj(v, level=level+1, indent=indent, **kwargs) for k, v in obj.items()])
+
+        if len(obj) > 0:
+            ret += spacer[:-indent]
+
+        ret += '}'
+
+    else:
+        ret = json.dumps(obj, default=_json_encoder_default_handler, **kwargs)
+
+    return ret
+
+
+def dumps_effect(obj, **kwargs):
+    return _print_obj(obj, **kwargs)
+
+def dump_effect(obj, file, **kwargs):
+    return print(_print_obj(obj, **kwargs), file=file)
+
+
+
 
 # import sys
 # import loader
