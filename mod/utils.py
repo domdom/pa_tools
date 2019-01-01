@@ -100,5 +100,5 @@ def restore():
             os.remove(_join(paths.PA_MEDIA_DIR, file))
 
     # remove backup
-    shutil.rmtree(backup_path)
+    shutil.rmtree(backup_path, ignore_errors=True)
 
