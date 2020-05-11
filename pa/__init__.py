@@ -26,7 +26,7 @@ class pafs:
                 self.mounts.remove((mnt, path))
                 return
 
-    def resolveFile(self, path):
+    def resolveFile(self, path, debug=False):
         path = _normalize(path)
         for i in range(len(self.mounts)):
             mounts = self.mounts[i:]
@@ -41,6 +41,9 @@ class pafs:
 
             if isfile(file_path):
                 return normpath(file_path)
+            elif debug:
+                print ('[pafs] NOT FILE:', file_path, ' with mounts: ')
+                list(map(print, mounts))
 
         return None
 
