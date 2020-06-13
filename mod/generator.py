@@ -94,6 +94,7 @@ def update_modinfo(base_modinfo):
         ('context', 'client')]
     )
     modinfo.update(base_modinfo)
+    modinfo['version'] += '-' + str(PA_VERSION)
     modinfo['build'] = str(PA_VERSION)
     modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
     modinfo['signature'] = modinfo.get('signature', ' ')
