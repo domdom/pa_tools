@@ -35,7 +35,11 @@ def _find_media_dir():
     log_dir = os.path.join(data_dir, 'log')
 
     if not os.path.isdir(log_dir):
-        raise FileNotFoundError('Could not find the log directory.')
+        # can't use the logs, so we have to guess
+        # Linux (stand alone)
+        path = os.path.normpath(os.path.join(data_dir, "stable/media"))
+        if os.path.isdir(path):
+            return path
 
     log_files = glob.glob(os.path.join(log_dir,'*.txt'))
     log_files = reversed(sorted(log_files))
