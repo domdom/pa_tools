@@ -74,7 +74,11 @@ def process_modinfo(modinfo_path, loader, out_dir):
     for w in warnings:
         print(w)
 
-    modinfo = update_modinfo(base_modinfo)
+    old_modinfo = os.path.join(out_dir, 'modinfo.json')
+    if os.path.exists(old_modinfo):
+        old_modinfo = pajson.loadf(old_modinfo)
+
+    modinfo = update_modinfo(base_modinfo, old_modinfo)
 
     print('identifier:', modinfo['identifier'])
     print('     build:', modinfo['build'])
@@ -88,7 +92,7 @@ def process_modinfo(modinfo_path, loader, out_dir):
     return modinfo
 
 
-def update_modinfo(base_modinfo):
+def update_modinfo(base_modinfo, old_modinfo):
     modinfo = collections.OrderedDict([
         ('identifier', 'no.mod.info.supplied'),
         ('context', 'client')]
@@ -96,7 +100,13 @@ def update_modinfo(base_modinfo):
     modinfo.update(base_modinfo)
     modinfo['version'] += '-' + str(PA_VERSION)
     modinfo['build'] = str(PA_VERSION)
-    modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
+
+    # if the PA build version hasn't changed, then don't change the date
+    if old_modinfo and modinfo['build'] == old_modinfo['build']:
+        modinfo['date'] = old_modinfo['date']
+    else:
+        modinfo['date'] = datetime.utcnow().strftime("%Y-%m-%d")
+
     modinfo['signature'] = modinfo.get('signature', ' ')
     return modinfo
 
