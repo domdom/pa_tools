@@ -48,7 +48,7 @@ def deploy_debug(mod_dir, is_titans):
     create_list = []
     replace_list = []
 
-    for root, dirs, files in os.walk(mod_dir):
+    for root, dirs, files in os.walk(_join(mod_dir, 'pa')):
         for file in files:
             # skip files that aren't relavant
             if file.startswith('.') or file.endswith('modinfo.json'):
