@@ -104,7 +104,7 @@ def restore():
 
     for file in log:
         with contextlib.suppress(FileNotFoundError):
-            to_remove = _join(paths.PA_MEDIA_DIR, file);
+            to_remove = _join(paths.PA_MEDIA_DIR, file)
             print('removed:', to_remove)
             os.remove(to_remove)
 

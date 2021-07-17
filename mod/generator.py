@@ -46,7 +46,7 @@ def process_from_file(change_file, loader, out_dir):
     from_file = loader.resolveFile(change_file)
 
     if from_file == None:
-        print ("!! ERROR: Not Found '" + change['from_file'] + "'\n")
+        print ("!! ERROR: Not Found '" + change_file + "'\n")
         loader.resolveFile(change_file, True)
         sys.exit(1)
 
