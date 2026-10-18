@@ -30,8 +30,7 @@ def _find_data_dir():
 """
 Reads PA's logs to find the last used PA media directory.
 """
-def _find_media_dir():
-    data_dir = _find_data_dir()
+def _find_media_dir(data_dir):
     log_dir = os.path.join(data_dir, 'log')
 
     if not os.path.isdir(log_dir):
@@ -71,17 +70,29 @@ def _find_media_dir():
 
                     raise FileNotFoundError('Could not find PA media directory. You must play the game at least once for this directory to be detected.')
 
+def _find_version_file(media_dir):
+    path = os.path.normpath(os.path.join(media_dir, '../version.txt'))
+    # Windows/Steam?
+    if os.path.isfile(path):
+        return path
 
-def _find_pa_build():
-    pa_version = os.path.normpath(os.path.join(_find_media_dir(), '..', 'version.txt'))
+    path = os.path.normpath(os.path.join(media_dir, '../PA.app/Contents/Resources/version.txt'))
+    if os.path.isfile(path):
+        return path
+
+    raise FileNotFoundError('Could not find PA version.txt file!')
+
+
+def _find_pa_build(media_dir):
+    pa_version = _find_version_file(media_dir)
 
     with open(pa_version) as version:
         return version.readline().strip()
 
 
-PA_VERSION = _find_pa_build()
 PA_DATA_DIR = _find_data_dir()
-PA_MEDIA_DIR = _find_media_dir()
+PA_MEDIA_DIR = _find_media_dir(PA_DATA_DIR)
+PA_VERSION = _find_pa_build(PA_MEDIA_DIR)
 
 
 
