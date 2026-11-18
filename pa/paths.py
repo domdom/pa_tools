@@ -47,6 +47,14 @@ def _find_media_dir(data_dir):
     for log_file in log_files:
         with open(log_file) as log:
             for line in log:
+                # Both UI backends log the media directory as the root mount; CEF logs no Coherent host dir.
+                m = re.search(r'INFO Mounting (.+) as /\s*$', line)
+                if m:
+                    path = os.path.normpath(m.group(1))
+                    if os.path.isdir(path):
+                        return path
+                    raise FileNotFoundError('Could not find the PA media directory %s named in %s.' % (path, log_file))
+
                 m = re.search(r'INFO Coherent host dir: "([^"]*)"', line)
                 if m:
                     base_path = m.group(1)
@@ -69,6 +77,8 @@ def _find_media_dir(data_dir):
                         return path
 
                     raise FileNotFoundError('Could not find PA media directory. You must play the game at least once for this directory to be detected.')
+
+    raise FileNotFoundError('Could not find PA media directory. You must play the game at least once for this directory to be detected.')
 
 def _find_version_file(media_dir):
     path = os.path.normpath(os.path.join(media_dir, '../version.txt'))
