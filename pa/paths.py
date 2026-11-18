@@ -45,7 +45,8 @@ def _find_media_dir(data_dir):
     log_files = map(lambda x: os.path.join(log_dir, x), log_files)
 
     for log_file in log_files:
-        with open(log_file) as log:
+        # PA writes its logs in UTF-8, not the locale codec. surrogateescape keeps a non-UTF-8 byte as it is.
+        with open(log_file, encoding='utf-8', errors='surrogateescape') as log:
             for line in log:
                 m = re.search(r'INFO Coherent host dir: "([^"]*)"', line)
                 if m:
